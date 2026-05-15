@@ -3,92 +3,295 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MONSTER ENERGY - Ignite Your Pulse</title>
+    <title>MONSTER | Ignite Your Pulse</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: #000; overflow-x: hidden; }
-        #canvas-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; }
-        .hero-content { position: relative; z-index: 10; min-height: 100vh; display: flex; flex-direction: column; pointer-events: none; }
-        .navbar { pointer-events: auto; animation: slideDown 1s ease-out 0.5s both; }
-        .main-content { flex: 1; display: flex; align-items: center; padding-left: 8vw; pointer-events: auto; }
-        .text-reveal { opacity: 0; transform: translateY(60px); animation: textReveal 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        .text-reveal-delay-1 { animation-delay: 0.8s; }
-        .text-reveal-delay-2 { animation-delay: 1s; }
-        .text-reveal-delay-3 { animation-delay: 1.2s; }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-40px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes textReveal { from { opacity: 0; transform: translateY(60px) scale(0.95); filter: blur(20px); } to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); } }
-        @keyframes glow { 0%, 100% { text-shadow: 0 0 20px rgba(57, 255, 20, 0.5), 0 0 40px rgba(57, 255, 20, 0.3), 0 0 60px rgba(57, 255, 20, 0.2); } 50% { text-shadow: 0 0 30px rgba(57, 255, 20, 0.8), 0 0 60px rgba(57, 255, 20, 0.5), 0 0 90px rgba(57, 255, 20, 0.3); } }
-        .caffeine-glow { animation: glow 2s ease-in-out infinite; }
-        .glass-nav { background: rgba(10, 10, 10, 0.6); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .nav-link { position: relative; transition: all 0.3s ease; }
-        .nav-link::after { content: ''; position: absolute; bottom: -4px; left: 50%; width: 0; height: 2px; background: linear-gradient(90deg, transparent, #39ff14, transparent); transition: all 0.3s ease; transform: translateX(-50%); }
-        .nav-link:hover::after { width: 100%; }
-        .nav-link:hover { color: #39ff14; text-shadow: 0 0 20px rgba(57, 255, 20, 0.5); }
-        .cta-button { background: linear-gradient(135deg, rgba(57, 255, 20, 0.1) 0%, rgba(57, 255, 20, 0.05) 100%); backdrop-filter: blur(10px); border: 1px solid rgba(57, 255, 20, 0.3); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); position: relative; overflow: hidden; }
-        .cta-button::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(57, 255, 20, 0.2), transparent); transition: left 0.5s ease; }
-        .cta-button:hover::before { left: 100%; }
-        .cta-button:hover { background: rgba(57, 255, 20, 0.2); border-color: #39ff14; box-shadow: 0 0 40px rgba(57, 255, 20, 0.4), 0 0 80px rgba(57, 255, 20, 0.2), inset 0 0 20px rgba(57, 255, 20, 0.1); transform: translateY(-2px); }
-        .scroll-indicator { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); animation: bounce 2s ease-in-out infinite; }
-        @keyframes bounce { 0%, 100% { transform: translateX(-50%) translateY(0); opacity: 1; } 50% { transform: translateX(-50%) translateY(10px); opacity: 0.5; } }
-        .film-grain { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100; opacity: 0.03; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"); }
-        .vignette { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 99; background: radial-gradient(ellipse at center, transparent 0%, transparent 40%, rgba(0,0,0,0.6) 100%); }
-        ::selection { background: rgba(57, 255, 20, 0.3); color: #fff; }
-        .loading-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 1000; display: flex; justify-content: center; align-items: center; transition: opacity 0.8s ease, visibility 0.8s ease; }
-        .loading-screen.hidden { opacity: 0; visibility: hidden; }
-        .loader-bar { width: 200px; height: 2px; background: rgba(255, 255, 255, 0.1); border-radius: 2px; overflow: hidden; }
-        .loader-progress { width: 0%; height: 100%; background: linear-gradient(90deg, #39ff14, #7fff00); animation: loading 2s ease-in-out forwards; box-shadow: 0 0 20px rgba(57, 255, 20, 0.5); }
-        @keyframes loading { 0% { width: 0%; } 100% { width: 100%; } }
-        .monster-logo { filter: drop-shadow(0 0 20px rgba(57, 255, 20, 0.5)); }
+        body { margin: 0; overflow: hidden; background-color: #050505; font-family: 'Inter', sans-serif; }
+        canvas { display: block; width: 100vw; height: 100vh; outline: none; }
+        .font-anton { font-family: 'Anton', sans-serif; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+        .glass-nav {
+            background: rgba(10, 10, 10, 0.6);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .text-glow-green { text-shadow: 0 0 20px rgba(57, 255, 20, 0.6), 0 0 40px rgba(57, 255, 20, 0.3); }
+        .gradient-text {
+            background: linear-gradient(to right, #ffffff, #9ca3af);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        #loader {
+            position: fixed; inset: 0; background: #000; z-index: 100;
+            display: flex; justify-content: center; align-items: center;
+            transition: opacity 1s ease;
+        }
+        .loader-bar { width: 200px; height: 2px; background: #1a1a1a; position: relative; overflow: hidden; }
+        .loader-progress {
+            position: absolute; left: 0; top: 0; height: 100%; width: 0%;
+            background: #39ff14; box-shadow: 0 0 10px #39ff14;
+            transition: width 0.5s ease;
+        }
     </style>
 </head>
-<body>
-    <div class="loading-screen" id="loadingScreen">
-        <div class="flex flex-col items-center gap-6">
-            <svg class="w-20 h-20 monster-logo" viewBox="0 0 100 100" fill="none">
-                <path d="M10 50 L20 30 L30 50 L40 20 L50 50 L60 25 L70 50 L80 35 L90 50" stroke="#39ff14" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <div class="loader-bar"><div class="loader-progress"></div></div>
+<body class="antialiased">
+    <div id="loader">
+        <div class="flex flex-col items-center gap-4">
+            <h1 class="font-anton text-4xl text-white tracking-widest">MONSTER</h1>
+            <div class="loader-bar"><div class="loader-progress" id="progress"></div></div>
         </div>
     </div>
-    <div class="film-grain"></div>
-    <div class="vignette"></div>
-    <div id="canvas-container"></div>
-    <div class="hero-content">
-        <nav class="navbar fixed top-0 left-0 right-0 z-50 px-8 py-6">
-            <div class="max-w-7xl mx-auto flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <svg class="w-10 h-10 monster-logo" viewBox="0 0 100 100" fill="none">
-                        <path d="M10 50 L20 30 L30 50 L40 20 L50 50 L60 25 L70 50 L80 35 L90 50" stroke="#39ff14" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    <span class="text-white font-bold text-xl tracking-wider">MONSTER</span>
+
+    <div class="absolute inset-0 pointer-events-none z-10 flex flex-col justify-between p-6 md:p-12">
+        <nav class="glass-nav rounded-full px-8 py-4 flex justify-between items-center max-w-7xl mx-auto w-full pointer-events-auto transition-all duration-300 hover:border-green-500/30">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-green-500 rounded-sm rotate-45 flex items-center justify-center shadow-[0_0_15px_rgba(57,255,20,0.8)]">
+                    <div class="w-4 h-4 bg-black rotate-45"></div>
                 </div>
-                <div class="hidden md:flex items-center gap-8 glass-nav px-8 py-3 rounded-full">
-                    <a href="#" class="nav-link text-white/80 text-sm font-medium uppercase tracking-wider">Products</a>
-                    <a href="#" class="nav-link text-white/80 text-sm font-medium uppercase tracking-wider">Athletes</a>
-                    <a href="#" class="nav-link text-white/80 text-sm font-medium uppercase tracking-wider">Events</a>
-                    <a href="#" class="nav-link text-white/80 text-sm font-medium uppercase tracking-wider">Gaming</a>
-                </div>
-                <button class="glass-nav px-6 py-3 rounded-full text-white text-sm font-medium uppercase tracking-wider hover:bg-green-500/20 transition-all duration-300">Shop Now</button>
+                <span class="font-anton text-xl text-white tracking-wider ml-2">ENERGY</span>
             </div>
+            <div class="hidden md:flex gap-8">
+                <a href="#" class="text-gray-400 hover:text-white text-sm uppercase tracking-widest transition-colors">Products</a>
+                <a href="#" class="text-gray-400 hover:text-white text-sm uppercase tracking-widest transition-colors">Athletes</a>
+                <a href="#" class="text-gray-400 hover:text-white text-sm uppercase tracking-widest transition-colors">Music</a>
+            </div>
+            <button class="bg-white/10 hover:bg-green-500/20 text-white px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest border border-white/10 hover:border-green-500/50 transition-all duration-300 backdrop-blur-md">Store</button>
         </nav>
-        <div class="main-content">
-            <div class="max-w-4xl">
-                <h1 class="text-reveal text-white font-black text-6xl md:text-8xl lg:text-9xl leading-none tracking-tight mb-4">IGNITE YOUR<br/><span class="text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-green-300 to-green-500 caffeine-glow">PULSE</span><br/>WITH</h1>
-                <h2 class="text-reveal text-reveal-delay-1 text-green-400 font-black text-7xl md:text-9xl lg:text-[12rem] leading-none tracking-tighter caffeine-glow">CAFFEINE</h2>
-                <p class="text-reveal text-reveal-delay-2 text-white/60 text-lg md:text-xl max-w-md mt-8 leading-relaxed">Unleash pure energy with our most potent formula yet. Engineered for those who demand maximum performance.</p>
-                <div class="text-reveal text-reveal-delay-3 mt-10">
-                    <button class="cta-button px-10 py-5 rounded-full text-white font-bold uppercase tracking-wider text-sm md:text-base">Experience The Power<svg class="inline-block w-5 h-5 ml-2 -mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button>
+
+        <div class="flex flex-col md:flex-row items-end md:items-center justify-between h-full pb-12 md:pb-0">
+            <div class="max-w-4xl pointer-events-auto">
+                <h2 class="text-green-500 font-bold tracking-[0.3em] text-sm md:text-base mb-4 animate-float opacity-0" id="subtitle">UNLEASH THE BEAST</h2>
+                <h1 class="font-anton text-6xl md:text-8xl lg:text-9xl text-white leading-none mb-6 mix-blend-screen opacity-0 transform translate-y-10" id="main-title">
+                    IGNITE YOUR <br />
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-green-600 text-glow-green">PULSE</span> WITH <br />
+                    <span class="gradient-text">CAFFEINE</span>
+                </h1>
+                <p class="text-gray-400 max-w-md text-sm md:text-base leading-relaxed mb-8 opacity-0 transform translate-y-10" id="description">
+                    Experience the raw power of volcanic energy. Formulated for those who demand the extreme. Zero sugar. Maximum impact.
+                </p>
+                <div class="flex gap-4 opacity-0 transform translate-y-10" id="cta-container">
+                    <button class="group relative px-8 py-4 bg-green-500 text-black font-bold uppercase tracking-widest overflow-hidden rounded-sm transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(57,255,20,0.6)]">
+                        <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                        <span class="relative z-10 flex items-center gap-2">Buy Now 
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                        </span>
+                    </button>
+                    <button class="px-8 py-4 glass-panel text-white font-bold uppercase tracking-widest rounded-sm hover:bg-white/10 transition-all hover:scale-105">Watch Film</button>
                 </div>
             </div>
-        </div>
-        <div class="scroll-indicator flex flex-col items-center gap-2">
-            <span class="text-white/40 text-xs uppercase tracking-widest">Scroll to explore</span>
-            <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+            <div class="hidden md:flex flex-col items-center gap-2 opacity-0" id="scroll-indicator">
+                <span class="text-[10px] uppercase tracking-widest text-gray-500">Scroll</span>
+                <div class="w-[1px] h-12 bg-gradient-to-b from-green-500 to-transparent"></div>
+            </div>
         </div>
     </div>
+
+    <div class="absolute inset-0 pointer-events-none z-20" style="background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.6) 100%);"></div>
+    <div class="absolute inset-0 pointer-events-none z-20 opacity-[0.04]" style="background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIj48ZmlsdGVyIGlkPSJnoiPjxmZVR1cmJ1bGVuY2UgdHlwZT0iZnJhY3RhbE5vaXNlIiBiYXNlRnJlcXVlbmN5PSIwLjY1IiBudW1PY3RhdmVzPSIzIiBzdGl0Y2hUaWxlcz0ic3RpdGNoIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsdGVyPSJ1cmwoI2cpIiBvcGFjaXR5PSIwLjQiLz48L3N2Zz4='); mix-blend-mode: overlay;"></div>
+    <div id="canvas-container" class="fixed inset-0 z-0"></div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="app.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <script>
+        const CONFIG = { colors: { green: 0x39ff14, orange: 0xff4500, black: 0x050505 }, can: { radius: 0.35, height: 1.2 } };
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(CONFIG.colors.black, 0.02);
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.set(0, 0, 4.5);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.2;
+        container.appendChild(renderer.domElement);
+
+        const composer = new THREE.EffectComposer(renderer);
+        composer.addPass(new THREE.RenderPass(scene, camera));
+        const bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
+        bloomPass.threshold = 0.2; bloomPass.strength = 1.2; bloomPass.radius = 0.8;
+        composer.addPass(bloomPass);
+
+        // Can Shader
+        const canVertexShader = `varying vec2 vUv; varying vec3 vNormal; varying vec3 vPosition;
+            void main() { vUv = uv; vNormal = normalize(normalMatrix * normal); vPosition = position;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`;
+        const canFragmentShader = `uniform float time; uniform vec3 colorLogo;
+            varying vec2 vUv; varying vec3 vNormal; varying vec3 vPosition;
+            float random(vec2 st) { return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123); }
+            float noise(vec2 st) {
+                vec2 i = floor(st); vec2 f = fract(st);
+                float a = random(i); float b = random(i + vec2(1.0, 0.0));
+                float c = random(i + vec2(0.0, 1.0)); float d = random(i + vec2(1.0, 1.0));
+                vec2 u = f*f*(3.0-2.0*f);
+                return mix(a, b, u.x) + (c - a)* u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+            }
+            void main() {
+                vec3 viewDir = normalize(cameraPosition - vPosition);
+                vec3 normal = vNormal;
+                float spec = pow(max(dot(viewDir, normal), 0.0), 32.0);
+                vec3 metalColor = mix(vec3(0.1), vec3(0.8), spec);
+                vec3 finalColor = mix(vec3(0.05), metalColor, 0.3);
+                float dropletNoise = noise(vUv * 40.0 + time * 0.1);
+                float droplets = smoothstep(0.6, 0.9, dropletNoise);
+                vec3 dropletSpec = vec3(1.0) * smoothstep(0.8, 1.0, noise(vUv * 100.0));
+                finalColor = mix(finalColor, vec3(0.8), droplets * 0.5);
+                finalColor += dropletSpec * droplets * 0.8;
+                bool isLogoArea = (vUv.v > 0.3 && vUv.v < 0.7);
+                if (isLogoArea) {
+                    float logoMask = smoothstep(0.4, 0.45, abs(vUv.u - 0.5));
+                    vec3 emissive = colorLogo * 2.0;
+                    finalColor = mix(finalColor, emissive, logoMask * 0.8);
+                    float flicker = sin(time * 10.0 + vUv.u * 20.0) * 0.5 + 0.5;
+                    finalColor += emissive * flicker * 0.2;
+                }
+                float rim = 1.0 - max(dot(viewDir, normal), 0.0);
+                rim = pow(rim, 3.0);
+                finalColor += vec3(0.1, 0.3, 0.1) * rim;
+                gl_FragColor = vec4(finalColor, 1.0);
+            }`;
+
+        const canGeometry = new THREE.CylinderGeometry(CONFIG.can.radius, CONFIG.can.radius, CONFIG.can.height, 64, 1, true);
+        const canMaterial = new THREE.ShaderMaterial({
+            vertexShader: canVertexShader, fragmentShader: canFragmentShader,
+            uniforms: { time: { value: 0 }, colorLogo: { value: new THREE.Color(CONFIG.colors.green) } },
+            transparent: true, side: THREE.DoubleSide
+        });
+        const canMesh = new THREE.Mesh(canGeometry, canMaterial);
+        canMesh.rotation.x = Math.PI / 2;
+        scene.add(canMesh);
+
+        const capGeo = new THREE.CylinderGeometry(CONFIG.can.radius, CONFIG.can.radius, 0.05, 64);
+        const capMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.4, metalness: 0.8 });
+        const topCap = new THREE.Mesh(capGeo, capMat); topCap.position.y = CONFIG.can.height / 2; canMesh.add(topCap);
+        const bottomCap = new THREE.Mesh(capGeo, capMat); bottomCap.position.y = -CONFIG.can.height / 2; canMesh.add(bottomCap);
+
+        // Claw Hand
+        const handGroup = new THREE.Group();
+        const rockMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.9, metalness: 0.2, flatShading: true });
+        for(let i=0; i<15; i++) {
+            const geo = new THREE.DodecahedronGeometry(Math.random() * 0.4 + 0.2, 0);
+            const mesh = new THREE.Mesh(geo, rockMat);
+            const angle = (i / 15) * Math.PI * 2;
+            mesh.position.set(Math.cos(angle) * 0.6 + (Math.random()-0.5)*0.2, -0.5 + Math.random() * 0.5, Math.sin(angle) * 0.6 + (Math.random()-0.5)*0.2);
+            mesh.rotation.set(Math.random()*Math.PI, Math.random()*Math.PI, 0);
+            mesh.scale.y = Math.random() * 2 + 1;
+            handGroup.add(mesh);
+            if(Math.random() > 0.7) {
+                const lava = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.3, 0.05), new THREE.MeshBasicMaterial({ color: CONFIG.colors.orange }));
+                lava.position.copy(mesh.position); lava.rotation.copy(mesh.rotation); handGroup.add(lava);
+            }
+        }
+        scene.add(handGroup);
+
+        // Fire Particles
+        const particleCount = 2000;
+        const fireGeo = new THREE.BufferGeometry();
+        const firePos = [], fireColors = [], fireSizes = [], fireSpeeds = [];
+        for(let i=0; i<particleCount; i++) {
+            firePos.push((Math.random() - 0.5) * 3, -2 - Math.random() * 2, (Math.random() - 0.5) * 3);
+            const type = Math.random();
+            if(type > 0.7) fireColors.push(0.2, 1.0, 0.2);
+            else if (type > 0.4) fireColors.push(1.0, 0.4, 0.0);
+            else fireColors.push(0.8, 0.0, 0.0);
+            fireSizes.push(Math.random() * 0.15 + 0.05);
+            fireSpeeds.push(Math.random() * 0.02 + 0.005);
+        }
+        fireGeo.setAttribute('position', new THREE.Float32BufferAttribute(firePos, 3));
+        fireGeo.setAttribute('customColor', new THREE.Float32BufferAttribute(fireColors, 3));
+        fireGeo.setAttribute('size', new THREE.Float32BufferAttribute(fireSizes, 1));
+        fireGeo.setAttribute('speed', new THREE.Float32BufferAttribute(fireSpeeds, 1));
+
+        const fireMat = new THREE.ShaderMaterial({
+            vertexShader: `attribute float size; attribute vec3 customColor; varying vec3 vColor;
+            void main() { vColor = customColor; vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+            gl_PointSize = size * (300.0 / -mvPosition.z); gl_Position = projectionMatrix * mvPosition; }`,
+            fragmentShader: `varying vec3 vColor; void main() {
+                vec2 coord = gl_PointCoord - vec2(0.5); float dist = length(coord);
+                if (dist > 0.5) discard;
+                float strength = pow(1.0 - (dist * 2.0), 1.5);
+                gl_FragColor = vec4(vColor, strength);
+            }`,
+            transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, vertexColors: true
+        });
+        const fireSystem = new THREE.Points(fireGeo, fireMat);
+        scene.add(fireSystem);
+
+        // Lighting
+        scene.add(new THREE.AmbientLight(0xffffff, 0.2));
+        const greenSpot = new THREE.SpotLight(CONFIG.colors.green, 2); greenSpot.position.set(2, 2, 2); scene.add(greenSpot);
+        const orangePoint = new THREE.PointLight(CONFIG.colors.orange, 1.5, 5); orangePoint.position.set(-1, -1, 1); scene.add(orangePoint);
+
+        // Animation
+        const clock = new THREE.Clock();
+        let mouseX = 0, mouseY = 0;
+        document.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX - window.innerWidth / 2) * 0.001;
+            mouseY = (e.clientY - window.innerHeight / 2) * 0.001;
+        });
+
+        window.addEventListener('load', () => {
+            const tl = gsap.timeline();
+            tl.to('#progress', { width: '100%', duration: 1.5, ease: 'power2.inOut' })
+              .to('#loader', { opacity: 0, duration: 0.5, onComplete: () => document.getElementById('loader').style.display = 'none' })
+              .to('#subtitle', { opacity: 1, y: 0, duration: 1 }, '-=0.5')
+              .to('#main-title', { opacity: 1, y: 0, duration: 1, ease: 'power3.out' }, '-=0.8')
+              .to('#description', { opacity: 1, y: 0, duration: 1 }, '-=0.6')
+              .to('#cta-container', { opacity: 1, y: 0, duration: 1 }, '-=0.6')
+              .to('#scroll-indicator', { opacity: 1, duration: 1 }, '-=0.5');
+            gsap.from(camera.position, { z: 10, duration: 2.5, ease: 'expo.out' });
+            gsap.from(canMesh.rotation, { y: Math.PI, duration: 2, ease: 'back.out(1.7)' });
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const time = clock.getElapsedTime();
+            canMaterial.uniforms.time.value = time;
+            canMesh.position.y = Math.sin(time * 1.5) * 0.05;
+            canMesh.rotation.z = Math.sin(time * 0.5) * 0.02;
+            camera.position.x += (mouseX * 2 - camera.position.x) * 0.05;
+            camera.position.y += (-mouseY * 2 - camera.position.y) * 0.05;
+            camera.lookAt(0, 0, 0);
+
+            const positions = fireSystem.geometry.attributes.position.array;
+            for(let i=0; i<particleCount; i++) {
+                positions[i*3 + 1] += fireSystem.geometry.attributes.speed.array[i] * 2;
+                positions[i*3] += Math.sin(time * 2 + positions[i*3+1]) * 0.002;
+                positions[i*3+2] += Math.cos(time * 1.5 + positions[i*3+1]) * 0.002;
+                if(positions[i*3 + 1] > 3) {
+                    positions[i*3 + 1] = -2 - Math.random();
+                    positions[i*3] = (Math.random() - 0.5) * 3;
+                    positions[i*3+2] = (Math.random() - 0.5) * 3;
+                }
+            }
+            fireSystem.geometry.attributes.position.needsUpdate = true;
+            handGroup.rotation.y = Math.sin(time * 0.2) * 0.05;
+            composer.render();
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            composer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
 </body>
 </html>
